@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    image: node:lts-bullseye
+    container_name: frontend_app
+    environment:
+      - NODE_ENV=development
+    working_dir: /app/frontend/filmore
+    volumes:
+      - .:/app/frontend  # Mount the current directory to the container
+    ports:
+      - "5173:5173"      # Expose the port for the application
+    command: npm run dev # Override the CMD specified in Dockerfile
+    user: node          # Use the 'node' user
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint:
+      - /bin/sh
