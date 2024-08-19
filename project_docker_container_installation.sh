@@ -26,5 +26,5 @@ docker rm $container_id
 # Extract the archive on the host
 tar -xzf archive.tar.gz
 
-# Optionally, remove the tarball after extraction
+#remove the tarball after extraction
 rm archive.tar.gz
