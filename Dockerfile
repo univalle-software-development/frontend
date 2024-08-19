@@ -7,6 +7,8 @@ ENV APPPATH /app/frontend
 WORKDIR $APPPATH
 RUN node -v
 RUN npm -v
+RUN chown -R node:node /usr/local/lib/node_modules
+RUN chown -R node:node /usr/local/bin
 RUN chown -R node:node $APPPATH
 USER node
 EXPOSE 5173
