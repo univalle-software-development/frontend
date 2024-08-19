@@ -1,0 +1,28 @@
+# Save the output of this file and use kubectl create -f to import
+# it into Kubernetes.
+#
+# Created with podman-5.1.1
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2024-08-19T03:55:18Z"
+  labels:
+    app: filmorecontainer-pod
+  name: filmorecontainer-pod
+spec:
+  containers:
+  - args:
+    - npm
+    - run
+    - dev
+    env:
+    - name: TERM
+      value: xterm
+    image: docker.io/library/filmore:latest
+    name: filmorecontainer
+    ports:
+    - containerPort: 5173
+      hostPort: 5173
+    securityContext: {}
+    stdin: true
+    tty: true
