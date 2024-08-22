@@ -26,7 +26,7 @@ function App() {
         </p>
       </div>
       <p className="read-the-docs">
-        Univalle Software development 2. It great!!!!!
+        Univalle Software development 2. It great!
       </p>
     </>
   )
