@@ -1,20 +1,23 @@
-version: '3.8'
-
 services:
-  app:
-    image: node:lts-bullseye
-    container_name: frontend_app
-    environment:
-      - NODE_ENV=development
-    working_dir: /app/frontend/filmore
-    volumes:
-      - .:/app/frontend  # Mount the current directory to the container
-    ports:
-      - "5173:5173"      # Expose the port for the application
-    command: npm run dev # Override the CMD specified in Dockerfile
-    user: node          # Use the 'node' user
+  app_frontend:
     build:
       context: .
       dockerfile: Dockerfile
-    entrypoint:
-      - /bin/sh
+    environment:
+      - NODE_ENV=development
+      - VITE_HOST=0.0.0.0
+    working_dir: /app/frontend/filmore
+    user: node  
+    volumes:
+      - ./filmore:/app/frontend/filmore  # Mount the current directory to the container
+    ports:
+      - "5173:5173"      # Expose the port for the application
+    networks:
+      - local
+
+    command: >
+      sh -c "if [ ! -d node_modules ]; then npm install; fi && npm run dev"
+
+networks:
+  local:
+    driver: bridge  
