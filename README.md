@@ -22,6 +22,6 @@ docker compose up frontend_app
 ```
 
 ## Access to the development server
-The app will be mapped to the port 5371
+The app will be mapped to the port 5371:
 
-[[http://localhost:5173/][Filmora app]]
+[Filmora app](http://localhost:5173/)
