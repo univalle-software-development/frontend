@@ -1,31 +1,32 @@
 name: Sonar Cloud frontend Scan
+
 on:
-	push:
-		branches:
-			- main
-	pull_request:
-		branches:
-			- main
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
-	sonarcloud:
-		name: SonarCloud
-		runs-on: ubuntu-latest
-		steps:
-		    - name: Checkout to main branch
-			  uses: actions/checkout@v3
-			  with:
-				fetch-depth: 0
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout to main branch
+        uses: actions/checkout@v3
 
-			- name: Setup nodejs
-			  uses: actions/setup-node@v3
-			  with:
-				node-version: '18'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17' # Specify the Java version you want to use  
+          distribution: 'corretto' # See 'Supported distributions' for available options
 
-			- name: Install npm dependencies
-			  run: npm install
 
-			- name: Build frontend
-			  run: npm run build
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
 			- name: SonarCloud Scan
 				env:
