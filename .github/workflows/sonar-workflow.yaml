@@ -26,8 +26,20 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+      - name: Install dependencies
+        working-directory: filmore
+        run: npm install
+
+      - name: Run tests with coverage
+        working-directory: filmore
+        run: npm run test:coverage
+
+      - name: Build application
+        working-directory: filmore
+        run: npm run build
 
       - name: SonarCloud Scan
+        working-directory: filmore
         env:
           SONAR_TOKEN: ${{ secrets.FRONTEND_SONAR_TOKEN }}
         run: |
