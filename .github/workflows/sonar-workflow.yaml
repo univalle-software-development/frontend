@@ -28,24 +28,19 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install npm dependencies
-        run: |
-          cd filmore
-          npm install
-
-      - name: Build frontend
-        run: |
-          cd filmore
-          npm install
-
-      - name: SonarCloud Scan
-        env:
-          SONAR_TOKEN: ${{ secrets.FRONTEND_SONAR_TOKEN }}
-        run: |
-          npx sonar-scanner \
-            -Dsonar.organization=univalle-software-development \
-            -Dsonar.projectKey=univalle-software-development_frontend \
-            -Dsonar.sources=./filmore/src \
-            -Dsonar.exclusions=**/node_modules/** \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.javascript.node.maxspace=4096
+			- name: SonarCloud Scan
+				env:
+					SONAR_TOKEN: ${{ secrets.FRONTEND_SONAR_TOKEN }}
+			  run: |
+			  	   npx sonar-scanner \
+				   -Dsonar.organization=univalle-software-development \
+				   -Dsonar.projectKey=univalle-software-development_frontend \
+				   -Dsonar.sources=./src \
+				   -Dsonar.exclusions=**/node_modules/** \
+				   -Dsonar.host.url=https://sonarcloud.io \
+				   -Dsonar.javascript.node.maxspace=4096 \
+				   -Dsonar.tests=./src/test \
+                   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+				   -Dsonar.genericCoverageReportPaths=coverage/coverage-final.json
+				   
+				   
