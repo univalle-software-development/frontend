@@ -46,7 +46,9 @@ README.md
 LICENSE
 .git
 .github
-filmome
-deployment.yml
+deployment.yaml
 docker-compose.yaml
 sonar-project.properties
+Dockerfile
+.dockerignore
+docker-compose.yml
