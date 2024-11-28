@@ -40,3 +40,13 @@ Thumbs.db
 
 project_docker_container_installation.sh
 project_podman_container_installation.sh
+
+README.md
+.gitignore
+LICENSE
+.git
+.github
+filmome
+deployment.yml
+docker-compose.yaml
+sonar-project.properties
