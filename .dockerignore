@@ -52,3 +52,4 @@ sonar-project.properties
 Dockerfile
 .dockerignore
 docker-compose.yml
+deployment.yml
