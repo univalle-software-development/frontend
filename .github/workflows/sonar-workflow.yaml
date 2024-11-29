@@ -21,6 +21,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Add this step to help us debug the directory structure
+      - name: Debug directory structure
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Directory contents:"
+          ls -la
+          echo "Parent directory contents:"
+          ls -la ..
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -33,13 +43,17 @@ jobs:
           node-version: '18'
           
       - name: Install dependencies
-        working-directory: filmore
-        run: npm install
+        run: |
+          if [ ! -d "filmore" ]; then
+            echo "Creating filmore directory"
+            mkdir filmore
+          fi
+          cd filmore
+          npm install
 
       - name: Run tests with coverage
-        id: test_coverage
-        working-directory: filmore
         run: |
+          cd filmore
           npm run test:coverage
           echo "coverage=$(cat coverage/coverage-summary.json | jq -r '.total.lines.pct')" >> $GITHUB_OUTPUT
 
@@ -56,14 +70,15 @@ jobs:
           fi
 
       - name: Build application
-        working-directory: filmore
-        run: npm run build
+        run: |
+          cd filmore
+          npm run build
 
       - name: SonarCloud Scan
-        working-directory: filmore
         env:
           SONAR_TOKEN: ${{ secrets.FRONTEND_SONAR_TOKEN }}
         run: |
+          cd filmore
           npx sonar-scanner \
             -Dsonar.organization=univalle-software-development \
             -Dsonar.projectKey=univalle-software-development_frontend \
