@@ -18,6 +18,14 @@ jobs:
           check-name: 'Quality Gate'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           wait-interval: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install PNPM
+        run: npm install -g pnpm
      
       - name: Install Vercel CLI
         run: npm install -g vercel
