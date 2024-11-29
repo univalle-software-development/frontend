@@ -1,35 +1,37 @@
-name: Vercel Production Deployment
-
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+name: Production Deployment
 
 on:
   push:
     branches:
-      - main  
+      - main
+
 jobs:
-  Deploy-production:
+  deploy-production:
     runs-on: ubuntu-latest
     steps:
-
       - uses: actions/checkout@v3
+      
+      - name: Wait for quality gate
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Quality Gate'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
      
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Pull Vercel Environment Information (Production)
+      - name: Pull Vercel Environment Information
+        working-directory: filmore
         run: |
           cd filmore
           vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}      
 
       - name: Build Project Artifacts
-        run: |
-          cd filmore 
-          vercel build --prod --token=${{ env.VERCEL_TOKEN }}
+        working-directory: filmore
+        run: vercel build --prod --token=${{ env.VERCEL_TOKEN }}
 
       - name: Deploy Project Artifacts to Vercel
-        run: |
-          cd filmore
-          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: filmore
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
