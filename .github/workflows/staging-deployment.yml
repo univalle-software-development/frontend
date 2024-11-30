@@ -1,29 +1,51 @@
-name: Vercel Staging Deployment
-
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+name: Staging Deployment
 
 on:
   push:
     branches:
-      - staging  
+      - staging
+
 jobs:
-  Deploy-staging:
+  deploy-staging:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Wait for quality gate
+        uses: lewagon/wait-on-check-action@v1.3.1
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Quality Gate'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
 
-      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Debug directory structure
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Directory contents:"
+          ls -la
      
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Pull Vercel Environment Information (Production)
-        run: vercel pull --yes --environment=staging --token=${{ secrets.VERCEL_TOKEN }}      
+      - name: Pull Vercel Environment Information
+        run: |
+          cd filmore
+          vercel pull --yes --environment=staging --token=${{ secrets.VERCEL_TOKEN }}      
 
       - name: Build Project Artifacts
-        run: vercel build --token=${{ env.VERCEL_TOKEN }}
+        run: |
+          cd filmore
+          vercel build --token=${{ secrets.VERCEL_TOKEN }}  # Using secrets instead of env
 
       - name: Deploy Project Artifacts to Vercel
-        run: vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+        run: |
+          cd filmore
+          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}

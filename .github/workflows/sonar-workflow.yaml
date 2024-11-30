@@ -1,46 +1,92 @@
-name: Sonar Cloud frontend Scan
+name: Quality Gate and Tests
 
 on:
   push:
     branches:
       - main
+      - staging
   pull_request:
     branches:
       - main
+      - staging
 
 jobs:
-  sonarcloud:
-    name: SonarCloud
+  quality-gate:
+    name: Quality Gate
     runs-on: ubuntu-latest
+    outputs:
+      tests_passed: ${{ steps.test_status.outputs.passed }}
+      
     steps:
-      - name: Checkout to main branch
+      - name: Checkout repository
         uses: actions/checkout@v3
+
+      # Add this step to help us debug the directory structure
+      - name: Debug directory structure
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Directory contents:"
+          ls -la
+          echo "Parent directory contents:"
+          ls -la ..
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17' # Specify the Java version you want to use  
-          distribution: 'corretto' # See 'Supported distributions' for available options
-
+          java-version: '17'
+          distribution: 'corretto'
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+          
+      - name: Install dependencies
+        run: |
+          if [ ! -d "filmore" ]; then
+            echo "Creating filmore directory"
+            mkdir filmore
+          fi
+          cd filmore
+          npm install
 
-			- name: SonarCloud Scan
-				env:
-					SONAR_TOKEN: ${{ secrets.FRONTEND_SONAR_TOKEN }}
-			  run: |
-			  	   npx sonar-scanner \
-				   -Dsonar.organization=univalle-software-development \
-				   -Dsonar.projectKey=univalle-software-development_frontend \
-				   -Dsonar.sources=./src \
-				   -Dsonar.exclusions=**/node_modules/** \
-				   -Dsonar.host.url=https://sonarcloud.io \
-				   -Dsonar.javascript.node.maxspace=4096 \
-				   -Dsonar.tests=./src/test \
-                   -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-				   -Dsonar.genericCoverageReportPaths=coverage/coverage-final.json
-				   
-				   
+      - name: Run tests with coverage
+        run: |
+          cd filmore
+          npm run test:coverage
+          echo "coverage=$(cat coverage/coverage-summary.json | jq -r '.total.lines.pct')" >> $GITHUB_OUTPUT
+
+      - name: Check test coverage
+        id: test_status
+        run: |
+          COVERAGE=${{ steps.test_coverage.outputs.coverage }}
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "Test coverage is below 80%"
+            exit 1
+          else
+            echo "passed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build application
+        run: |
+          cd filmore
+          npm run build
+
+      - name: SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.FRONTEND_SONAR_TOKEN }}
+        run: |
+          cd filmore
+          npx sonar-scanner \
+            -Dsonar.organization=univalle-software-development \
+            -Dsonar.projectKey=univalle-software-development_frontend \
+            -Dsonar.sources=./src \
+            -Dsonar.exclusions=**/node_modules/**,**/test/**,**/*.test.jsx,**/*.spec.js,**/*.js \
+            -Dsonar.coverage.exclusions=**/*.css \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.javascript.node.maxspace=4096 \
+            -Dsonar.tests=./src/test \
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+            -Dsonar.genericCoverageReportPaths=coverage/coverage-final.json
