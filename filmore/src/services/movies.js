@@ -8,7 +8,7 @@ export const searchMovies = async ({ search }) => {
 		  : import.meta.env.VITE_API_URL_DEV;
 	
 	try {
-		const response = await fetch(`${apiUrl}?q=${search}`);;
+		const response = await fetch(`${apiUrl}?q=${search}`);
 		return response.json();
 	} catch (e) {
 		throw new Error('Error searching movies')
