@@ -15,12 +15,11 @@ describe('searchMovies', () => {
   })
 
   it('should return movies data when search term is valid', async () => {
-    const mockMovies = {
-      Search: [
-        { imdbID: '1', Title: 'Movie 1', Year: '2021', Poster: 'image1.jpg' },
-        { imdbID: '2', Title: 'Movie 2', Year: '2022', Poster: 'image2.jpg' }
+    const mockMovies = [
+        { id: '1', title: 'Movie 1', year: '2021', image: 'image1.jpg' },
+        { id: '2', title: 'Movie 2', year: '2022', image: 'image2.jpg' }
       ]
-    }
+ 
 
     // Simula la respuesta de la API
     fetch.mockResolvedValueOnce({
